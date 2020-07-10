@@ -115,28 +115,23 @@ ulimit -c 0
 # %T    時間(hh:mm)
 # %t    時間(hh:mm(am/pm))
 
-# vcs_infoロード
-autoload -Uz vcs_info
-
 # PROMPT変数内で変数参照する
 setopt prompt_subst
 
-# vcsの表示
-zstyle ':vcs_info:*' enable git svn hg bzr
-zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:*' stagedstr "+"
-zstyle ':vcs_info:*' unstagedstr "*"
-zstyle ':vcs_info:*' formats '(%b%c%u)'
-zstyle ':vcs_info:*' actionformats '(%b(%a)%c%u)'
+source "/usr/local/opt/zsh-git-prompt/zshrc.sh"
+ZSH_THEME_GIT_PROMPT_PREFIX="["
+ZSH_THEME_GIT_PROMPT_SUFFIX=" ]"
+ZSH_THEME_GIT_PROMPT_BRANCH="%{$fg[white]%}"
+ZSH_THEME_GIT_PROMPT_STAGED="%{$fg[green]%}%{ %G%}"
+ZSH_THEME_GIT_PROMPT_CONFLICTS="%{$fg[magenta]%}%{x%G%}"
+ZSH_THEME_GIT_PROMPT_CHANGED="%{$fg[red]%}%{+%G%}"
+ZSH_THEME_GIT_PROMPT_BEHIND="%{$fg[red]%}%{-%G%}"
+ZSH_THEME_GIT_PROMPT_AHEAD="%{$fg[green]%}%{+%G%}"
+ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[green]%}%{✔%G%}"
 
 # プロンプト表示直前にvcs_info呼び出し
-precmd () {
-    psvar=()
-    LANG=en_US.UTF-8 vcs_info
-    [[ -n "$vcs_info_msg_0_" ]] && psvar[1]="$vcs_info_msg_0_"
-}
-#add-zsh-hook precmd _update_vcs_info_msg
-PROMPT="%{${fg[green]}%}%n%{${reset_color}%}@%F{blue}localhost%f:~%F{green}%d%f[%1(v|%F{red}%1v%f|)] $ "
+PROMPT='%{${fg[green]}%}%n%{${reset_color}%}@%F{blue}localhost%f:~%F{green}%d%f$(git_super_status) $ '
+RPROMPT='[%W %T]'
 # -----------------------------
 # Completion
 # -----------------------------
@@ -194,6 +189,9 @@ setopt histignorealldups
 # 他のターミナルとヒストリーを共有
 setopt share_history
 
+# 直前のコマンドの重複を削除
+setopt hist_ignore_dups
+
 # すでにhistoryにあるコマンドは残さない
 setopt hist_ignore_all_dups
 
@@ -202,6 +200,9 @@ alias h='fc -lt '%F %T' 1'
 
 # ヒストリに保存するときに余分なスペースを削除する
 setopt hist_reduce_blanks
+
+# 補完で小文字でも大文字にマッチさせる
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
 # 履歴をすぐに追加する
 setopt inc_append_history
