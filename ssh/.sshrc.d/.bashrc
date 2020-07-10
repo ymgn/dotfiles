@@ -1,0 +1,1 @@
+/Users/ymgn/dotfiles/.bashrc

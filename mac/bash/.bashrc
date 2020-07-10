@@ -61,14 +61,40 @@ function git_diff_archive()
   git archive --format=zip --prefix=root/ $h `eval $diff` -o archive.zip
 }
 
+# bash-completion
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+    . $(brew --prefix)/etc/bash_completion
+fi
+
 ############# alias
+#### Git
 alias g='git'
+alias gc='git checkout'
+alias gcb='git checkout -b'
+alias gp='git push'
+# 空白等の差分は無視して表示
+alias gd='git diff -b'
+
+### phpのローカルサーバーを立ち上げる
+alias phpS='php -S localhost:9000'
+
 alias ll='ls -la'
 alias cdw='cd ~/Documents/work/'
 
+### ショートカット
+alias gitconfig='vim ~/.gitconfig'
+alias ssh_hosts='sh ~/.ssh/known_ssh_hosts.sh'
+
+### 検索ワンライナー
+alias goo='searchByGoogle'
+function searchByGoogle() {
+    # 第一引数がない場合はpbpasteの中身を検索単語とする
+    [ -z "$1" ] && searchWord=`pbpaste` || searchWord=$1
+    open https://www.google.co.jp/search\?q\=$searchWord
+}
+
 ### Application
-alias winSCP='wine /Applications/Windows/WinSCP-5.13.4-Portable/WinSCP.exe'
-alias winMergeU='wine /Applications/Windows/WinMerge/WinMergeU.exe'
+alias typora="open -a typora"
 
 ### ghkw
 GITHUB_TOKEN=10e1eed8a62e8499cc8beee754da96dd560627b8
