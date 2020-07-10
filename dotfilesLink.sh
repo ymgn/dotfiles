@@ -7,6 +7,7 @@ ln -sf ~/dotfiles/mac/bash/.bashrc ~/.bashrc
 # git
 ln -sf ~/dotfiles/mac/git/.gitconfig ~/.gitconfig
 ln -sf ~/dotfiles/mac/git/.git-completion.bash ~/.git-completion.bash
+ln -sf ~/dotfiles/mac/git/.git-completion.zsh ~/.git-completion.zsh
 ln -sf ~/dotfiles/mac/git/.git-prompt.sh ~/.git-prompt.sh
 ln -sf ~/dotfiles/mac/git/.gitignore_global ~/.gitignore_global
 

@@ -114,13 +114,34 @@ ulimit -c 0
 # %*    時間(hh:flag_mm:ss)
 # %T    時間(hh:mm)
 # %t    時間(hh:mm(am/pm))
-PROMPT='%F{cyan}%n@%m%f:%~# '
 
+# vcs_infoロード
+autoload -Uz vcs_info
+
+# PROMPT変数内で変数参照する
+setopt prompt_subst
+
+# vcsの表示
+zstyle ':vcs_info:*' enable git svn hg bzr
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' stagedstr "+"
+zstyle ':vcs_info:*' unstagedstr "*"
+zstyle ':vcs_info:*' formats '(%b%c%u)'
+zstyle ':vcs_info:*' actionformats '(%b(%a)%c%u)'
+
+# プロンプト表示直前にvcs_info呼び出し
+precmd () {
+    psvar=()
+    LANG=en_US.UTF-8 vcs_info
+    [[ -n "$vcs_info_msg_0_" ]] && psvar[1]="$vcs_info_msg_0_"
+}
+#add-zsh-hook precmd _update_vcs_info_msg
+PROMPT="%{${fg[green]}%}%n%{${reset_color}%}@%F{blue}localhost%f:~%F{green}%d%f[%1(v|%F{red}%1v%f|)] $ "
 # -----------------------------
 # Completion
 # -----------------------------
 # 自動補完を有効にする
-autoload -Uz compinit ; compinit
+autoload -Uz compinit && compinit
 
 # 単語の入力途中でもTab補完を有効化
 #setopt complete_in_word
