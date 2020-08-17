@@ -354,6 +354,12 @@ if which go > /dev/null 2>&1  ; then
   export PATH=$PATH:$(go env GOROOT)/bin:$GOPATH/bin
 fi
 
+
+# -----------------------------
+# JDK
+# -----------------------------
+export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+
 # -----------------------------
 # Git
 # -----------------------------

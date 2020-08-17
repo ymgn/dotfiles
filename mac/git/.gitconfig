@@ -63,8 +63,6 @@
 
 [fetch]
 	prune = true
-[commit]
-	template = ~/.stCommitMsg
 [merge]
 	ff = false
 [pull]
