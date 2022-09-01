@@ -1,5 +1,4 @@
 tap "adoptopenjdk/openjdk"
-tap "chatwork/chatwork", "git@github.com:chatwork/homebrew-chatwork.git"
 tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/core"
