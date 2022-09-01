@@ -2,6 +2,7 @@
 	excludesfile = ~/.gitignore_global
 	autoCRLF = false
 	quotepath = false
+	hooksPath = /dev/null
 [user]
 	name = ymgn
 	email = gonyamagon@gmail.com

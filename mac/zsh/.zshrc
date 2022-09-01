@@ -260,6 +260,10 @@ alias dki="docker run -i -t -P"
 alias dex="docker exec -i -t"
 alias drmf='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
 
+alias logall="docker-compose logs -f --tail=100"
+alias logweb="docker-compose logs -f --tail=500 cw-web-php-fpm"
+alias sshweb="docker-compose exec cw-web-php-fpm /bin/bash"
+
 # -----------------------------
 # Plugin
 # -----------------------------
@@ -337,6 +341,9 @@ case "${OSTYPE}" in
   ;;
 esac
 
+# ChatworkTools
+export PATH=~/Source/chatwork_tools/bin:$PATH
+
 # -----------------------------
 # Python
 # -----------------------------
@@ -383,3 +390,5 @@ function gs() {
   git stash list | fzf-down --reverse -d: --preview 'git show --color=always {1}' |
   cut -d: -f1
 }
+
+# JDK
