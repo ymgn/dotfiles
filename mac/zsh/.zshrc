@@ -118,7 +118,7 @@ ulimit -c 0
 # PROMPT変数内で変数参照する
 setopt prompt_subst
 
-source "/usr/local/opt/zsh-git-prompt/zshrc.sh"
+source "/opt/homebrew/opt/zsh-git-prompt/zshrc.sh"
 ZSH_THEME_GIT_PROMPT_PREFIX="["
 ZSH_THEME_GIT_PROMPT_SUFFIX=" ]"
 ZSH_THEME_GIT_PROMPT_BRANCH="%{$fg[white]%}"
@@ -392,3 +392,11 @@ function gs() {
 }
 
 # JDK
+
+# Added by Antigravity
+export PATH="/Users/ymgn/.antigravity/antigravity/bin:$PATH"
+
+# -----------------------------
+# Powerlevel10k
+# -----------------------------
+source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
