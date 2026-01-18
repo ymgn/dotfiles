@@ -1,7 +1,8 @@
 #!/bin/sh
 ## mac
 # ai
-ln -sf ~/dotfiles/AGENT.md ~/AGENT.md
+mkdir -p ~/.codex 2>/dev/null
+ln -sf ~/dotfiles/mac/ai/AGENTS.md ~/.codex/AGENTS.md
 
 # bash
 ln -sf ~/dotfiles/mac/bash/.bash_profile ~/.bash_profile

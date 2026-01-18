@@ -19,6 +19,10 @@ export EDITOR=vim
 # パスを追加したい場合
 export PATH="$HOME/bin:$PATH"
 
+# Load NVM to make Node available in PATH
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 # cdした際のディレクトリをディレクトリスタックへ自動追加
 setopt auto_pushd
 
@@ -321,7 +325,7 @@ zplug "b4b4r07/enhancd", use:init.sh
 #zplug "junegunn/fzf-bin", as:command, from:gh-r, file:fzf
 
 # インストールしていないプラグインをインストール
-if ! zplug check --verbose; then
+if ! zplug check; then
   printf "Install? [y/N]: "
   if read -q; then
       echo; zplug install
@@ -329,7 +333,7 @@ if ! zplug check --verbose; then
 fi
 
 # コマンドをリンクして、PATH に追加し、プラグインは読み込む
-zplug load --verbose
+zplug load
 
 # -----------------------------
 # PATH
@@ -399,4 +403,9 @@ export PATH="/Users/ymgn/.antigravity/antigravity/bin:$PATH"
 # -----------------------------
 # Powerlevel10k
 # -----------------------------
+POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
+[[ -r ~/.p10k.zsh ]] && source ~/.p10k.zsh
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
