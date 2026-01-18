@@ -1,5 +1,8 @@
 #!/bin/sh
 ## mac
+# ai
+ln -sf ~/dotfiles/AGENT.md ~/AGENT.md
+
 # bash
 ln -sf ~/dotfiles/mac/bash/.bash_profile ~/.bash_profile
 ln -sf ~/dotfiles/mac/bash/.bashrc ~/.bashrc
