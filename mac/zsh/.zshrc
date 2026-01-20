@@ -16,12 +16,23 @@ export EDITOR=vim
 # Ctrl+Dでログアウトしてしまうことを防ぐ
 #setopt IGNOREEOF
 
-# パスを追加したい場合
+# Homebrew (Apple Silicon) と個人bin
+if [ -d /opt/homebrew/bin ]; then
+  export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+fi
 export PATH="$HOME/bin:$PATH"
 
-# Load NVM to make Node available in PATH
+# Load NVM lazily for faster shell startup
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm_lazy_load() {
+  unset -f node npm npx nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+}
+for _nvm_cmd in node npm npx nvm; do
+  eval "${_nvm_cmd}() { nvm_lazy_load; ${_nvm_cmd} \"\$@\"; }"
+done
+unset _nvm_cmd
 
 # cdした際のディレクトリをディレクトリスタックへ自動追加
 setopt auto_pushd
@@ -44,12 +55,6 @@ setopt extended_glob
 # コマンドラインがどのように展開され実行されたかを表示するようになる
 #setopt xtrace
 
-# 自動でpushdを実行
-setopt auto_pushd
-
-# pushdから重複を削除
-setopt pushd_ignore_dups
-
 # ビープ音を鳴らさないようにする
 #setopt no_beep
 
@@ -61,9 +66,6 @@ setopt auto_cd
 
 # bgプロセスの状態変化を即時に知らせる
 setopt notify
-
-# 8bit文字を有効にする
-setopt print_eight_bit
 
 # 終了ステータスが0以外の場合にステータスを表示する
 setopt print_exit_value
@@ -122,31 +124,30 @@ ulimit -c 0
 # PROMPT変数内で変数参照する
 setopt prompt_subst
 
-source "/opt/homebrew/opt/zsh-git-prompt/zshrc.sh"
-ZSH_THEME_GIT_PROMPT_PREFIX="["
-ZSH_THEME_GIT_PROMPT_SUFFIX=" ]"
-ZSH_THEME_GIT_PROMPT_BRANCH="%{$fg[white]%}"
-ZSH_THEME_GIT_PROMPT_STAGED="%{$fg[green]%}%{ %G%}"
-ZSH_THEME_GIT_PROMPT_CONFLICTS="%{$fg[magenta]%}%{x%G%}"
-ZSH_THEME_GIT_PROMPT_CHANGED="%{$fg[red]%}%{+%G%}"
-ZSH_THEME_GIT_PROMPT_BEHIND="%{$fg[red]%}%{-%G%}"
-ZSH_THEME_GIT_PROMPT_AHEAD="%{$fg[green]%}%{+%G%}"
-ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[green]%}%{✔%G%}"
-
-# プロンプト表示直前にvcs_info呼び出し
-PROMPT='%{${fg[green]}%}%n%{${reset_color}%}@%F{blue}localhost%f:~%F{green}%d%f$(git_super_status) $ '
+if [ -r "/opt/homebrew/opt/zsh-git-prompt/zshrc.sh" ]; then
+  source "/opt/homebrew/opt/zsh-git-prompt/zshrc.sh"
+  ZSH_THEME_GIT_PROMPT_PREFIX="["
+  ZSH_THEME_GIT_PROMPT_SUFFIX=" ]"
+  ZSH_THEME_GIT_PROMPT_BRANCH="%{$fg[white]%}"
+  ZSH_THEME_GIT_PROMPT_STAGED="%{$fg[green]%}%{ %G%}"
+  ZSH_THEME_GIT_PROMPT_CONFLICTS="%{$fg[magenta]%}%{x%G%}"
+  ZSH_THEME_GIT_PROMPT_CHANGED="%{$fg[red]%}%{+%G%}"
+  ZSH_THEME_GIT_PROMPT_BEHIND="%{$fg[red]%}%{-%G%}"
+  ZSH_THEME_GIT_PROMPT_AHEAD="%{$fg[green]%}%{+%G%}"
+  ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[green]%}%{✔%G%}"
+  PROMPT='%{${fg[green]}%}%n%{${reset_color}%}@%F{blue}localhost%f:~%F{green}%d%f$(git_super_status) $ '
+else
+  PROMPT='%{${fg[green]}%}%n%{${reset_color}%}@%F{blue}localhost%f:~%F{green}%d%f $ '
+fi
 RPROMPT='[%W %T]'
 # -----------------------------
 # Completion
 # -----------------------------
 # 自動補完を有効にする
-autoload -Uz compinit && compinit
+autoload -Uz compinit && compinit -C
 
 # 単語の入力途中でもTab補完を有効化
 #setopt complete_in_word
-
-# コマンドミスを修正
-setopt correct
 
 # 補完の選択を楽にする
 zstyle ':completion:*' menu select
@@ -200,13 +201,10 @@ setopt hist_ignore_dups
 setopt hist_ignore_all_dups
 
 # historyに日付を表示
-alias h='fc -lt '%F %T' 1'
+alias h="fc -lt '%F %T' 1"
 
 # ヒストリに保存するときに余分なスペースを削除する
 setopt hist_reduce_blanks
-
-# 補完で小文字でも大文字にマッチさせる
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
 # 履歴をすぐに追加する
 setopt inc_append_history
@@ -243,8 +241,16 @@ alias ls='ls -G'
 alias la='ls -la -G'
 alias ll='ls -l -G'
 
-alias du="du -Th"
-alias df="df -Th"
+if command -v gdu >/dev/null 2>&1; then
+  alias du="gdu -h"
+else
+  alias du="du -h"
+fi
+if command -v gdf >/dev/null 2>&1; then
+  alias df="gdf -h"
+else
+  alias df="df -h"
+fi
 alias su="su -l"
 alias so='source'
 alias vi='vim'
@@ -264,9 +270,17 @@ alias dki="docker run -i -t -P"
 alias dex="docker exec -i -t"
 alias drmf='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
 
-alias logall="docker-compose logs -f --tail=100"
-alias logweb="docker-compose logs -f --tail=500 cw-web-php-fpm"
-alias sshweb="docker-compose exec cw-web-php-fpm /bin/bash"
+docker_compose() {
+  if command -v docker-compose >/dev/null 2>&1; then
+    command docker-compose "$@"
+  else
+    command docker compose "$@"
+  fi
+}
+
+alias logall="docker_compose logs -f --tail=100"
+alias logweb="docker_compose logs -f --tail=500 cw-web-php-fpm"
+alias sshweb="docker_compose exec cw-web-php-fpm /bin/bash"
 
 # -----------------------------
 # Plugin
@@ -308,42 +322,29 @@ function drm()
 # -----------------------------
 # Plugin
 # -----------------------------
-# zplugが無ければインストール
-if [[ ! -d ~/.zplug ]];then
-  git clone https://github.com/zplug/zplug ~/.zplug
+ANTIDOTE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/antidote"
+ANTIDOTE_HOME=""
+ANTIDOTE_BUNDLE="${ANTIDOTE_DIR}/antidote.zshrc"
+ANTIDOTE_PLUGINS="$HOME/dotfiles/mac/zsh/antidote.plugins.txt"
+
+if [[ -r "/opt/homebrew/opt/antidote/share/antidote/antidote.zsh" ]]; then
+  ANTIDOTE_HOME="/opt/homebrew/opt/antidote/share/antidote"
+elif [[ -r "$HOME/.antidote/antidote.zsh" ]]; then
+  ANTIDOTE_HOME="$HOME/.antidote"
+elif [[ -r "${ANTIDOTE_DIR}/antidote/antidote.zsh" ]]; then
+  ANTIDOTE_HOME="${ANTIDOTE_DIR}/antidote"
 fi
 
-# zplugを有効化する
-source ~/.zplug/init.zsh
-
-# プラグインList
-# zplug "ユーザー名/リポジトリ名", タグ
-zplug "zsh-users/zsh-completions"
-zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-syntax-highlighting", defer:2
-zplug "b4b4r07/enhancd", use:init.sh
-#zplug "junegunn/fzf-bin", as:command, from:gh-r, file:fzf
-
-# インストールしていないプラグインをインストール
-if ! zplug check; then
-  printf "Install? [y/N]: "
-  if read -q; then
-      echo; zplug install
+if [[ -n "${ANTIDOTE_HOME}" ]]; then
+  source "${ANTIDOTE_HOME}/antidote.zsh"
+  if [[ -r "${ANTIDOTE_PLUGINS}" ]]; then
+    if [[ ! -f "${ANTIDOTE_BUNDLE}" || "${ANTIDOTE_PLUGINS}" -nt "${ANTIDOTE_BUNDLE}" ]]; then
+      mkdir -p "${ANTIDOTE_DIR}"
+      antidote bundle < "${ANTIDOTE_PLUGINS}" >| "${ANTIDOTE_BUNDLE}"
+    fi
+    source "${ANTIDOTE_BUNDLE}"
   fi
 fi
-
-# コマンドをリンクして、PATH に追加し、プラグインは読み込む
-zplug load
-
-# -----------------------------
-# PATH
-# -----------------------------
-case "${OSTYPE}" in
-  darwin*)
-    export PATH=/opt/local/bin:/opt/local/sbin:$PATH
-    export MANPATH=/opt/local/share/man:/opt/local/man:$MANPATH
-  ;;
-esac
 
 # ChatworkTools
 export PATH=~/Source/chatwork_tools/bin:$PATH
@@ -369,7 +370,7 @@ fi
 # -----------------------------
 # JDK
 # -----------------------------
-export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+#export JAVA_HOME=$(/usr/libexec/java_home)
 
 # -----------------------------
 # Git
