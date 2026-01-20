@@ -3,6 +3,14 @@
 
 dotfilesのファイルを変更した場合はcommitし、新規で追加する場合は合わせて ```dotfilesdotfilesLink.sh```にシンボリックリンクのコマンドを追加する
 
+## Quick start (macOS Apple Silicon)
+```sh
+git clone <repo>
+cd dotfiles
+./setup.sh
+```
+Apple Silicon (Homebrew at /opt/homebrew) 前提。権限で実行できない場合は `chmod +x setup.sh` を実行。
+
 ## 使い方
 gitの状態を表示させるためのプラグインをbrewで追加
 ``` brew install zsh-git-prompt ```
