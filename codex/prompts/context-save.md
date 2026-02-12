@@ -1,16 +1,20 @@
 ---
 description: Save shared context memory
-argument-hint: KEYWORD=<keyword optional> TEXT=<log text optional> OVERVIEW=<overview for first save optional>
+argument-hint: TEXT=<optional source text>
 ---
 Use the context-memory workflow to save memory.
 
 Rules:
-1. Resolve KEYWORD from `$KEYWORD` if provided.
-2. If KEYWORD is missing, use current git branch `feature/<KEYWORD>`.
-3. If TEXT is missing, summarize recent conversation with enough detail.
-4. If memory file does not exist, ask for overview and use it.
-5. If memory file exists, load and show it before appending.
+1. Prefer zero-arg usage. Infer KEYWORD automatically:
+   - first: current git branch `feature/<KEYWORD>`
+   - fallback: most recently updated `~/ai-memory/*.md`
+2. If `$TEXT` is provided, use it; otherwise summarize recent conversation with enough detail.
+3. If memory file exists, load and show it before appending.
+4. If memory file does not exist, create it and auto-generate overview from the first meaningful line.
 
 Run:
-- `python3 ~/.codex/skills/context-memory/scripts/context_save.py "$KEYWORD" "$TEXT" --overview "$OVERVIEW"` when KEYWORD is provided.
-- `printf '%s\n' "$TEXT" | python3 ~/.codex/skills/context-memory/scripts/context_save.py --overview "$OVERVIEW"` when KEYWORD is omitted.
+- with text:
+  `printf '%s\n' "$TEXT" | python3 ~/dotfiles/codex/skills/context-memory/scripts/context_save.py`
+- without text:
+  summarize recent conversation, then
+  `printf '%s\n' "<SUMMARY>" | python3 ~/dotfiles/codex/skills/context-memory/scripts/context_save.py`

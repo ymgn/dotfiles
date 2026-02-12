@@ -22,7 +22,9 @@ Parsing rules:
 - Everything after `<KEYWORD>` is `<TEXT...>` and must be saved as source text.
 - If no text is provided, generate a summary from recent conversation logs with enough detail.
 - `<KEYWORD>` can be Japanese. Reject `/` and empty values.
-- If `<KEYWORD>` is omitted, resolve it from current git branch name `feature/<KEYWORD>`.
+- If `<KEYWORD>` is omitted, resolve it in order:
+  1) current git branch name `feature/<KEYWORD>`
+  2) most recently updated file in `~/ai-memory/*.md`
 
 ## Memory Structure
 Each keyword maps to a single Markdown file:
@@ -47,22 +49,23 @@ File format:
 
 ## Save Workflow
 When `/context-save` is issued:
-1) Parse `<KEYWORD>` and `<TEXT...>`. If `<KEYWORD>` is missing, derive from current branch `feature/<KEYWORD>`.
-2) If target file does not exist, ask the user for a short overview and pass it via `--overview`.
+1) Parse `<KEYWORD>` and `<TEXT...>`.
+2) If `<KEYWORD>` is missing, infer it from branch or latest memory file.
 3) If target file exists, read and present the existing memory first.
 4) If no text is provided, summarize recent work with sufficient detail (do not over-compress).
-5) Append a timestamped log entry.
+5) If target file does not exist, create it and auto-generate `## 概要` from the first meaningful line.
+6) Append a timestamped log entry.
 
 Use the script:
 
 ```bash
-python3 ~/.codex/skills/context-memory/scripts/context_save.py <KEYWORD> "<TEXT...>" --overview "<概要>"
+python3 ~/dotfiles/codex/skills/context-memory/scripts/context_save.py <KEYWORD> "<TEXT...>"
 ```
 
 Notes:
-- `--overview` is required only for first save.
+- `--overview` is optional; if omitted on first save, it is auto-generated from text.
 - Existing files append logs without rewriting `## 概要`.
-- You can omit `<KEYWORD>` only when current branch is `feature/<KEYWORD>`.
+- You can omit `<KEYWORD>` in zero-arg mode; branch and recent memory are used for inference.
 
 ## Load Workflow
 When `/context-load` is issued:

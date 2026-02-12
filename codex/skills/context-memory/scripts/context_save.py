@@ -48,6 +48,33 @@ def detect_keyword_from_branch() -> str:
     return candidate
 
 
+def detect_latest_keyword(base_dir: str) -> str:
+    latest_path = ""
+    latest_mtime = -1.0
+    try:
+        names = os.listdir(base_dir)
+    except OSError:
+        return ""
+    for name in names:
+        if not name.endswith(".md"):
+            continue
+        if name.startswith("."):
+            continue
+        path = os.path.join(base_dir, name)
+        if not os.path.isfile(path):
+            continue
+        try:
+            mtime = os.path.getmtime(path)
+        except OSError:
+            continue
+        if mtime > latest_mtime:
+            latest_mtime = mtime
+            latest_path = path
+    if not latest_path:
+        return ""
+    return os.path.basename(latest_path)[:-3]
+
+
 def create_memory_file(path: str, keyword: str, overview: str) -> None:
     content = (
         f"# {keyword}\n\n"
@@ -104,17 +131,28 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def build_overview(text: str, explicit_overview: str) -> str:
+    if explicit_overview.strip():
+        return explicit_overview.strip()
+    for line in text.splitlines():
+        line = line.strip()
+        if line:
+            return line[:120]
+    return "概要未設定"
+
+
 def main() -> int:
     args = parse_args()
+    base_dir = os.path.expanduser("~/ai-memory")
+    os.makedirs(base_dir, exist_ok=True)
 
     raw_keyword = args.keyword.strip()
     if not raw_keyword:
         raw_keyword = detect_keyword_from_branch()
         if not raw_keyword:
-            print(
-                "Error: KEYWORD is required or current branch must match feature/<KEYWORD>",
-                file=sys.stderr,
-            )
+            raw_keyword = detect_latest_keyword(base_dir)
+        if not raw_keyword:
+            print("Error: KEYWORD could not be inferred. Pass KEYWORD once.", file=sys.stderr)
             return 2
 
     try:
@@ -130,8 +168,6 @@ def main() -> int:
         print("Error: no text provided", file=sys.stderr)
         return 2
 
-    base_dir = os.path.expanduser("~/ai-memory")
-    os.makedirs(base_dir, exist_ok=True)
     path = memory_path(base_dir, keyword)
     existing = load_existing_memory(path)
 
@@ -140,13 +176,7 @@ def main() -> int:
         print(existing)
 
     if not os.path.exists(path):
-        overview = args.overview.strip()
-        if not overview:
-            print(
-                "Error: overview is required for first save. Pass --overview '<概要>'",
-                file=sys.stderr,
-            )
-            return 2
+        overview = build_overview(text, args.overview)
         create_memory_file(path, keyword, overview)
 
     append_log(path, text)
