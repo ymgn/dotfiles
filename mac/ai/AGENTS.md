@@ -40,3 +40,8 @@
 
 ## ✅ 推奨する進め方（安全な手順）
 1. 現状確認：`pwd` / `ls`
+
+## 🧠 横断ナレッジ運用
+- 横断知識は `~/ai-memory/knowledge/*.md` に蓄積する
+- ナレッジ保存は `/reflect` を使う
+- 実装/設計/デバッグ/レビューの前に、依頼文を要約して `python3 ~/dotfiles/codex/skills/knowledge-memory/scripts/knowledge_lookup.py --task "<要約>"` で関連知識を確認してから進める
