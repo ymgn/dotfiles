@@ -1,71 +1,86 @@
 ---
 name: context-memory
-description: Shared project memory management for /context-save and /context-load slash-style commands; use when the user wants to write or read case-specific memory (spec, decisions, next steps, logs) under ~/ai-memory so multiple agents can share context.
+description: Shared project memory management for /context-save and /context-load slash-style commands; use when the user wants to write or read case-specific memory under ~/ai-memory so multiple agents can share context.
 ---
 
 # Context Memory
 
 ## Overview
-Maintain a shared, case-scoped memory in `~/ai-memory` that multiple agents can read and write. Use slash-style commands to save or load project context, work logs, and next steps.
+Maintain shared, keyword-scoped memory in `~/ai-memory` that multiple agents can read and write.
+Use slash-style commands to save or load project context and work logs.
 
 ## Command Parsing
 Treat the following as explicit commands, not general questions:
 
-- `/context-save <CASE-ID> <TEXT...>`
-- `/context-save <CASE-ID>` (no text provided)
-- `/context-load <CASE-ID>`
+- `/context-save <KEYWORD> <TEXT...>`
+- `/context-save <KEYWORD>` (no text provided)
+- `/context-save` (if current branch is `feature/<KEYWORD>`)
+- `/context-load <KEYWORD>`
 
 Parsing rules:
-- `<CASE-ID>` is the first token after the command.
-- Everything after `<CASE-ID>` is `<TEXT...>` and must be saved verbatim.
-- If no text is provided, generate a single-line, compact summary of the recent conversation that is easy to skim later.
+- `<KEYWORD>` is the first token after the command.
+- Everything after `<KEYWORD>` is `<TEXT...>` and must be saved as source text.
+- If no text is provided, generate a summary from recent conversation logs with enough detail.
+- `<KEYWORD>` can be Japanese. Reject `/` and empty values.
+- If `<KEYWORD>` is omitted, resolve it from current git branch name `feature/<KEYWORD>`.
 
 ## Memory Structure
-Each case ID maps to a directory:
+Each keyword maps to a single Markdown file:
 
-```
-~/ai-memory/<CASE-ID>/
-  spec.md
-  decisions.md
-  next.md
-  log.md
+```text
+~/ai-memory/<KEYWORD>.md
 ```
 
-File purposes:
-- `spec.md`: project purpose, scope, constraints.
-- `decisions.md`: confirmed decisions and rationale.
-- `next.md`: immediate next actions.
-- `log.md`: time-stamped work log (append-only).
+File format:
+
+```markdown
+# <KEYWORD>
+
+## 概要
+<initial overview from user>
+
+## ログ
+### YYYY-MM-DD HH:MM
+- 実施内容:
+  - ...
+```
 
 ## Save Workflow
 When `/context-save` is issued:
-1) Parse `<CASE-ID>` and `<TEXT...>`.
-2) If no text is provided, summarize the most recent discussion into one single line.
-3) Append the line to `log.md` with a timestamp.
-4) Create the case directory and files if they do not exist.
+1) Parse `<KEYWORD>` and `<TEXT...>`. If `<KEYWORD>` is missing, derive from current branch `feature/<KEYWORD>`.
+2) If target file does not exist, ask the user for a short overview and pass it via `--overview`.
+3) If target file exists, read and present the existing memory first.
+4) If no text is provided, summarize recent work with sufficient detail (do not over-compress).
+5) Append a timestamped log entry.
 
 Use the script:
 
 ```bash
-python3 ~/.codex/skills/context-memory/scripts/context_save.py <CASE-ID> "<TEXT...>"
+python3 ~/.codex/skills/context-memory/scripts/context_save.py <KEYWORD> "<TEXT...>" --overview "<概要>"
 ```
 
-If you generated the summary yourself, pass it as `<TEXT...>`.
+Notes:
+- `--overview` is required only for first save.
+- Existing files append logs without rewriting `## 概要`.
+- You can omit `<KEYWORD>` only when current branch is `feature/<KEYWORD>`.
 
 ## Load Workflow
 When `/context-load` is issued:
-1) Parse `<CASE-ID>`.
-2) Read `spec.md`, `decisions.md`, `next.md`, then `log.md`.
-3) Present the content in a concise way so work can resume quickly.
+1) Parse `<KEYWORD>`.
+2) Read `~/ai-memory/<KEYWORD>.md`.
+3) Present the content concisely so work can resume quickly.
 
 Use the script:
 
 ```bash
-python3 ~/.codex/skills/context-memory/scripts/context_load.py <CASE-ID>
+python3 ~/.codex/skills/context-memory/scripts/context_load.py <KEYWORD>
 ```
+
+Compatibility:
+- Loader still reads legacy directory format (`~/ai-memory/<KEYWORD>/{spec,decisions,next,log}.md`) if present.
 
 ## Resources
 
 ### scripts/
-- `context_save.py`: creates case directory/files if missing and appends a timestamped log entry.
-- `context_load.py`: reads the case memory files and prints them in order.
+- `context_save.py`: creates `~/ai-memory/<KEYWORD>.md` on first save and appends timestamped logs.
+- `context_load.py`: reads new single-file memory first, then falls back to legacy directory format.
