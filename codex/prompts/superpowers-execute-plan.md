@@ -1,4 +1,4 @@
 ---
-description: Load superpowers executing-plans skill
+description: superpowers の executing-plans スキルを使う
 ---
-Use the `superpowers:executing-plans` skill and follow it exactly. Announce that you are using the skill and then proceed with execution.
+`superpowers:executing-plans` スキルを使って厳密に進める。スキル使用を宣言してから実行フローに従う。

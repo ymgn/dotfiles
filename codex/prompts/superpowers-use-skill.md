@@ -1,5 +1,5 @@
 ---
-description: Load a superpowers skill by name
+description: 名前指定で superpowers スキルを使う
 argument-hint: NAME=<skill-name>
 ---
-Use the `$NAME` skill and follow it exactly. Announce that you are using the skill and then proceed with its workflow.
+`$NAME` スキルを使って厳密に進める。スキル使用を宣言してから、そのワークフローに従う。

@@ -1,20 +1,18 @@
 ---
-description: Save shared context memory
-argument-hint: TEXT=<optional source text>
+description: 共有コンテキスト記憶を保存
+argument-hint: キーワード=<任意>
 ---
-Use the context-memory workflow to save memory.
+context-memory の手順で記憶を保存する。
 
-Rules:
-1. Prefer zero-arg usage. Infer KEYWORD automatically:
-   - first: current git branch `feature/<KEYWORD>`
-   - fallback: most recently updated `~/ai-memory/*.md`
-2. If `$TEXT` is provided, use it; otherwise summarize recent conversation with enough detail.
-3. If memory file exists, load and show it before appending.
-4. If memory file does not exist, create it and auto-generate overview from the first meaningful line.
+ルール:
+1. 基本は引数なしで実行し、キーワードは自動推定する。
+   - 優先: 現在ブランチ `feature/<キーワード>`
+   - 代替: `~/ai-memory/*.md` の最終更新ファイル
+2. キーワードが指定されていればそれを使う。
+3. 保存本文は直近会話を十分な情報量で要約して作る。
+4. 既存ファイルがあれば内容を先に読み出してから追記する。
+5. ファイルがなければ作成し、概要は本文先頭の有意な1行から自動生成する。
 
-Run:
-- with text:
-  `printf '%s\n' "$TEXT" | python3 ~/dotfiles/codex/skills/context-memory/scripts/context_save.py`
-- without text:
-  summarize recent conversation, then
-  `printf '%s\n' "<SUMMARY>" | python3 ~/dotfiles/codex/skills/context-memory/scripts/context_save.py`
+実行例:
+- 会話を要約して保存:
+  `printf '%s\n' "<SUMMARY>" | python3 ~/dotfiles/codex/skills/context-memory/scripts/context_save.py <キーワード>`

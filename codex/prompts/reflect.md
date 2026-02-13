@@ -1,14 +1,14 @@
 ---
-description: Reflect recent conversation and store reusable cross-project knowledge
-argument-hint: TEXT=<optional source text>
+description: 直近会話を振り返って横断ナレッジに保存
+argument-hint: テキスト=<任意>
 ---
-Use the knowledge-memory workflow and save insights.
+knowledge-memory の手順で知見を保存する。
 
-Rules:
-1. Use `$TEXT` as source if provided; otherwise use recent conversation.
-2. Extract up to 5 practical insights.
-3. Prefer categories: coding, tooling, workflow, debugging, ops, design, security, testing, product, other.
-4. If none fit, use `proposed:<name>`.
-5. Output JSON array objects with: `category`, `title`, `context`, `insight`, `action`, `confidence`.
-6. Save by running:
+ルール:
+1. `テキスト` があれば優先し、なければ直近会話を使う。
+2. 実務で再利用できる知見を最大5件抽出する。
+3. カテゴリは `coding/tooling/workflow/debugging/ops/design/security/testing/product/other` を優先する。
+4. 既存カテゴリで合わない場合は `proposed:<name>` を使う。
+5. 各項目は `category/title/context/insight/action/confidence` を持つ JSON 配列にする。
+6. 次のコマンドで保存する:
    `printf '%s\n' '<JSON_ARRAY>' | python3 ~/dotfiles/codex/skills/knowledge-memory/scripts/reflect_save.py`

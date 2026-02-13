@@ -1,4 +1,4 @@
 ---
-description: Load superpowers writing-plans skill
+description: superpowers の writing-plans スキルを使う
 ---
-Use the `superpowers:writing-plans` skill and follow it exactly. Announce that you are using the skill and then proceed with the planning workflow.
+`superpowers:writing-plans` スキルを使って厳密に進める。スキル使用を宣言してから計画作成フローに従う。

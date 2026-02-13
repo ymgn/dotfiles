@@ -1,45 +1,43 @@
 ---
 name: context-memory
-description: Shared project memory management for /context-save and /context-load slash-style commands; use when the user wants to write or read case-specific memory under ~/ai-memory so multiple agents can share context.
+description: /context-save と /context-load で共有コンテキスト記憶を扱う。~/ai-memory 配下で複数エージェントが参照できるようにする。
 ---
 
 # Context Memory
 
-## Overview
-Maintain shared, keyword-scoped memory in `~/ai-memory` that multiple agents can read and write.
-Use slash-style commands to save or load project context and work logs.
+## 概要
+`~/ai-memory` にキーワード単位の共有記憶を保持する。
+slash 形式コマンドでプロジェクト文脈や作業ログを保存・読込する。
 
-## Command Parsing
-Treat the following as explicit commands, not general questions:
+## コマンド解釈
+以下は通常質問ではなく明示コマンドとして扱う:
 
-- `/context-save <KEYWORD> <TEXT...>`
-- `/context-save <KEYWORD>` (no text provided)
-- `/context-save` (if current branch is `feature/<KEYWORD>`)
-- `/context-load <KEYWORD>`
+- `/context-save <キーワード>` (任意)
+- `/context-save` (現在ブランチが `feature/<キーワード>` の場合)
+- `/context-load <キーワード>`
 
-Parsing rules:
-- `<KEYWORD>` is the first token after the command.
-- Everything after `<KEYWORD>` is `<TEXT...>` and must be saved as source text.
-- If no text is provided, generate a summary from recent conversation logs with enough detail.
-- `<KEYWORD>` can be Japanese. Reject `/` and empty values.
-- If `<KEYWORD>` is omitted, resolve it in order:
-  1) current git branch name `feature/<KEYWORD>`
-  2) most recently updated file in `~/ai-memory/*.md`
+解釈ルール:
+- `<キーワード>` は指定された場合の先頭トークン。
+- 保存本文は直近会話を十分な情報量で要約して生成する。
+- `<キーワード>` は日本語可。`/` と空値は拒否する。
+- `<キーワード>` 省略時は以下順で解決する。
+  1) 現在ブランチ `feature/<キーワード>`
+  2) `~/ai-memory/*.md` の最終更新ファイル
 
-## Memory Structure
-Each keyword maps to a single Markdown file:
+## 記憶構造
+キーワードごとに単一 Markdown ファイルで保存する。
 
 ```text
-~/ai-memory/<KEYWORD>.md
+~/ai-memory/<キーワード>.md
 ```
 
-File format:
+ファイル形式:
 
 ```markdown
-# <KEYWORD>
+# <キーワード>
 
 ## 概要
-<initial overview from user>
+<初回要約>
 
 ## ログ
 ### YYYY-MM-DD HH:MM
@@ -47,43 +45,43 @@ File format:
   - ...
 ```
 
-## Save Workflow
-When `/context-save` is issued:
-1) Parse `<KEYWORD>` and `<TEXT...>`.
-2) If `<KEYWORD>` is missing, infer it from branch or latest memory file.
-3) If target file exists, read and present the existing memory first.
-4) If no text is provided, summarize recent work with sufficient detail (do not over-compress).
-5) If target file does not exist, create it and auto-generate `## 概要` from the first meaningful line.
-6) Append a timestamped log entry.
+## 保存フロー
+`/context-save` 実行時:
+1) 任意の `<キーワード>` を解釈する。
+2) `<キーワード>` がない場合はブランチまたは最新記憶から推定する。
+3) 対象ファイルがある場合は先に読み出して表示する。
+4) 本文は直近会話を十分な情報量で要約して作る。
+5) 対象ファイルがない場合は作成し、`## 概要` は本文先頭の有意な1行で自動生成する。
+6) タイムスタンプ付きでログ追記する。
 
-Use the script:
-
-```bash
-python3 ~/dotfiles/codex/skills/context-memory/scripts/context_save.py <KEYWORD> "<TEXT...>"
-```
-
-Notes:
-- `--overview` is optional; if omitted on first save, it is auto-generated from text.
-- Existing files append logs without rewriting `## 概要`.
-- You can omit `<KEYWORD>` in zero-arg mode; branch and recent memory are used for inference.
-
-## Load Workflow
-When `/context-load` is issued:
-1) Parse `<KEYWORD>`.
-2) Read `~/ai-memory/<KEYWORD>.md`.
-3) Present the content concisely so work can resume quickly.
-
-Use the script:
+実行例:
 
 ```bash
-python3 ~/.codex/skills/context-memory/scripts/context_load.py <KEYWORD>
+printf '%s\n' "<SUMMARY>" | python3 ~/dotfiles/codex/skills/context-memory/scripts/context_save.py <キーワード>
 ```
 
-Compatibility:
-- Loader still reads legacy directory format (`~/ai-memory/<KEYWORD>/{spec,decisions,next,log}.md`) if present.
+補足:
+- `--overview` は任意。未指定時は本文から自動生成される。
+- 既存ファイルは `## 概要` を維持してログのみ追記する。
+- `<キーワード>` は省略可能。
 
-## Resources
+## 読込フロー
+`/context-load` 実行時:
+1) `<キーワード>` を解釈する。
+2) `~/ai-memory/<キーワード>.md` を読み込む。
+3) 作業再開しやすい形で簡潔に提示する。
+
+実行例:
+
+```bash
+python3 ~/dotfiles/codex/skills/context-memory/scripts/context_load.py <キーワード>
+```
+
+互換性:
+- 旧形式 `~/ai-memory/<キーワード>/{spec,decisions,next,log}.md` も読込可能。
+
+## リソース
 
 ### scripts/
-- `context_save.py`: creates `~/ai-memory/<KEYWORD>.md` on first save and appends timestamped logs.
-- `context_load.py`: reads new single-file memory first, then falls back to legacy directory format.
+- `context_save.py`: `~/ai-memory/<キーワード>.md` の作成とタイムスタンプ付き追記を行う。
+- `context_load.py`: 新形式を優先読込し、必要なら旧形式をフォールバックで読む。

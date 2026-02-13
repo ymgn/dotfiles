@@ -1,4 +1,4 @@
 ---
-description: Load superpowers brainstorming skill
+description: superpowers の brainstorming スキルを使う
 ---
-Use the `superpowers:brainstorming` skill and follow it exactly. Announce that you are using the skill and then proceed with the brainstorming workflow.
+`superpowers:brainstorming` スキルを使って厳密に進める。スキル使用を宣言してから、brainstorming ワークフローに従う。
