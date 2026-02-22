@@ -61,7 +61,7 @@ def read_recent_blocks(path: str, limit: int) -> List[str]:
 def main() -> int:
     args = parse_args()
     categories = infer_categories(args.task)
-    base_dir = os.path.expanduser("~/ai-memory/knowledge")
+    base_dir = os.path.expanduser("~/dotfiles/ai-memory/knowledge")
 
     print(f"task: {args.task}")
     print(f"categories: {', '.join(categories)}")

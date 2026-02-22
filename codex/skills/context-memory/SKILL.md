@@ -1,12 +1,12 @@
 ---
 name: context-memory
-description: /context-save と /context-load で共有コンテキスト記憶を扱う。~/ai-memory 配下で複数エージェントが参照できるようにする。
+description: /context-save と /context-load で共有コンテキスト記憶を扱う。~/dotfiles/ai-memory 配下で複数エージェントが参照できるようにする。
 ---
 
 # Context Memory
 
 ## 概要
-`~/ai-memory` にキーワード単位の共有記憶を保持する。
+`~/dotfiles/ai-memory` にキーワード単位の共有記憶を保持する。
 slash 形式コマンドでプロジェクト文脈や作業ログを保存・読込する。
 
 ## コマンド解釈
@@ -22,13 +22,13 @@ slash 形式コマンドでプロジェクト文脈や作業ログを保存・�
 - `<キーワード>` は日本語可。`/` と空値は拒否する。
 - `<キーワード>` 省略時は以下順で解決する。
   1) 現在ブランチ `feature/<キーワード>`
-  2) `~/ai-memory/*.md` の最終更新ファイル
+  2) `~/dotfiles/ai-memory/*.md` の最終更新ファイル
 
 ## 記憶構造
 キーワードごとに単一 Markdown ファイルで保存する。
 
 ```text
-~/ai-memory/<キーワード>.md
+~/dotfiles/ai-memory/<キーワード>.md
 ```
 
 ファイル形式:
@@ -68,7 +68,7 @@ printf '%s\n' "<SUMMARY>" | python3 ~/dotfiles/codex/skills/context-memory/scrip
 ## 読込フロー
 `/context-load` 実行時:
 1) `<キーワード>` を解釈する。
-2) `~/ai-memory/<キーワード>.md` を読み込む。
+2) `~/dotfiles/ai-memory/<キーワード>.md` を読み込む。
 3) 作業再開しやすい形で簡潔に提示する。
 
 実行例:
@@ -78,10 +78,10 @@ python3 ~/dotfiles/codex/skills/context-memory/scripts/context_load.py <キー�
 ```
 
 互換性:
-- 旧形式 `~/ai-memory/<キーワード>/{spec,decisions,next,log}.md` も読込可能。
+- 旧形式 `~/dotfiles/ai-memory/<キーワード>/{spec,decisions,next,log}.md` も読込可能。
 
 ## リソース
 
 ### scripts/
-- `context_save.py`: `~/ai-memory/<キーワード>.md` の作成とタイムスタンプ付き追記を行う。
+- `context_save.py`: `~/dotfiles/ai-memory/<キーワード>.md` の作成とタイムスタンプ付き追記を行う。
 - `context_load.py`: 新形式を優先読込し、必要なら旧形式をフォールバックで読む。

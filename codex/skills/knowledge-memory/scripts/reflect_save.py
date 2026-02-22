@@ -37,7 +37,7 @@ def normalize_category(raw: str) -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Save cross-project knowledge entries into ~/ai-memory/knowledge"
+        description="Save cross-project knowledge entries into ~/dotfiles/ai-memory/knowledge"
     )
     parser.add_argument(
         "--max-items",
@@ -129,7 +129,7 @@ def main() -> int:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
 
-    base_dir = os.path.expanduser("~/ai-memory/knowledge")
+    base_dir = os.path.expanduser("~/dotfiles/ai-memory/knowledge")
     os.makedirs(base_dir, exist_ok=True)
 
     saved = 0

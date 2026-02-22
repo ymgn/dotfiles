@@ -110,7 +110,7 @@ def load_existing_memory(path: str) -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Save context memory entry to ~/ai-memory/<KEYWORD>.md"
+        description="Save context memory entry to ~/dotfiles/ai-memory/<KEYWORD>.md"
     )
     parser.add_argument(
         "keyword",
@@ -143,7 +143,7 @@ def build_overview(text: str, explicit_overview: str) -> str:
 
 def main() -> int:
     args = parse_args()
-    base_dir = os.path.expanduser("~/ai-memory")
+    base_dir = os.path.expanduser("~/dotfiles/ai-memory")
     os.makedirs(base_dir, exist_ok=True)
 
     raw_keyword = args.keyword.strip()

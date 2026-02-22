@@ -43,7 +43,7 @@ def main() -> int:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
 
-    base_dir = os.path.expanduser("~/ai-memory")
+    base_dir = os.path.expanduser("~/dotfiles/ai-memory")
     new_path = os.path.join(base_dir, f"{keyword}.md")
     if os.path.isfile(new_path):
         print(read_if_exists(new_path).strip())

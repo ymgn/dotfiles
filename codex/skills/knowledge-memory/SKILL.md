@@ -1,12 +1,12 @@
 ---
 name: knowledge-memory
-description: /reflect で直近会話から横断知識を抽出し、~/ai-memory/knowledge にカテゴリ保存する。
+description: /reflect で直近会話から横断知識を抽出し、~/dotfiles/ai-memory/knowledge にカテゴリ保存する。
 ---
 
 # Knowledge Memory
 
 ## 概要
-`~/ai-memory/knowledge` にプロジェクト横断の知識を蓄積する。
+`~/dotfiles/ai-memory/knowledge` にプロジェクト横断の知識を蓄積する。
 `/reflect` で再利用可能な知見を抽出し、カテゴリ別ファイルへ保存する。
 
 ## コマンド
